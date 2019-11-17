@@ -79,6 +79,8 @@ func TestParseDate(t *testing.T) {
 		{"999-01-26", Date{}},
 		{"", Date{}},
 		{"2016-01-02x", Date{}},
+		{"2016-01-02T00:00:00.000Z", Date{2016, 1, 2}},
+		{"2016-01-02T23:59:59.999Z", Date{2016, 1, 2}},
 	} {
 		got, err := ParseDate(test.str)
 		if got != test.want {

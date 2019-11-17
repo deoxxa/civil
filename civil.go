@@ -36,8 +36,13 @@ func (d Date) Format(f string) string {
 func ParseDate(s string) (Date, error) {
 	t, err := time.Parse("2006-01-02", s)
 	if err != nil {
+		if t, err := time.Parse("2006-01-02T15:04:05Z07:00", s); err == nil {
+			return DateOf(t), nil
+		}
+
 		return Date{}, err
 	}
+
 	return DateOf(t), nil
 }
 

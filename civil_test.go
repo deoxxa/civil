@@ -250,9 +250,52 @@ func TestAddMonths(t *testing.T) {
 			end:   Date{2014, 2, 28},
 			n:     1,
 		},
+		{
+			desc:  "earlier month fewer days (leap year)",
+			start: Date{2012, 3, 31},
+			end:   Date{2012, 2, 29},
+			n:     -1,
+		},
+		{
+			desc:  "later month fewer days (leap year)",
+			start: Date{2012, 1, 31},
+			end:   Date{2012, 2, 29},
+			n:     1,
+		},
 	} {
 		if got := test.start.AddMonths(test.n); got != test.end {
 			t.Errorf("[%s] %#v.AddMonths(%v) = %#v, want %#v", test.desc, test.start, test.n, got, test.end)
+		}
+	}
+}
+
+func TestSetDayClamped(t *testing.T) {
+	for _, test := range []struct {
+		desc          string
+		input, output Date
+		day           int
+	}{
+		{
+			desc:   "january",
+			input:  Date{2014, 1, 1},
+			output: Date{2014, 1, 31},
+			day:    31,
+		},
+		{
+			desc:   "february (normal)",
+			input:  Date{2011, 2, 1},
+			output: Date{2011, 2, 28},
+			day:    31,
+		},
+		{
+			desc:   "february (leap)",
+			input:  Date{2012, 2, 1},
+			output: Date{2012, 2, 29},
+			day:    31,
+		},
+	} {
+		if got := test.input.SetDayClamped(test.day); got != test.output {
+			t.Errorf("[%s] %#v.SetDayClamped(%v) = %#v, want %#v", test.desc, test.input, test.day, got, test.output)
 		}
 	}
 }

@@ -62,6 +62,69 @@ func (d Date) AddDays(n int) Date {
 	return DateOf(d.In(time.UTC).AddDate(0, 0, n))
 }
 
+func maxDate(year int, month time.Month) int {
+	switch month {
+	case time.January:
+		return 31
+	case time.February:
+		if year%400 == 0 || year%4 == 0 && year%100 != 0 {
+			return 29
+		}
+
+		return 28
+	case time.March:
+		return 31
+	case time.April:
+		return 30
+	case time.May:
+		return 31
+	case time.June:
+		return 30
+	case time.July:
+		return 31
+	case time.August:
+		return 31
+	case time.September:
+		return 30
+	case time.October:
+		return 31
+	case time.November:
+		return 30
+	case time.December:
+		return 31
+	}
+
+	return -1
+}
+
+func clampDate(year int, month time.Month, date int) int {
+	if max := maxDate(year, month); date > max {
+		return max
+	}
+	return date
+}
+
+func (d Date) AddMonths(n int) Date {
+	year := d.Year
+	month := (int(d.Month) - 1) + n
+
+	if month >= 12 {
+		for month >= 12 {
+			year++
+			month -= 12
+		}
+	} else if month < 0 {
+		for month < 0 {
+			year--
+			month += 12
+		}
+	}
+
+	day := clampDate(year, time.Month(month+1), d.Day)
+
+	return Date{Year: year, Month: time.Month(month + 1), Day: day}
+}
+
 func (d Date) DaysSince(s Date) (days int) {
 	deltaUnix := d.In(time.UTC).Unix() - s.In(time.UTC).Unix()
 	return int(deltaUnix / 86400)

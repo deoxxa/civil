@@ -151,6 +151,112 @@ func TestDateArithmetic(t *testing.T) {
 	}
 }
 
+func TestAddDays(t *testing.T) {
+	for _, test := range []struct {
+		desc  string
+		start Date
+		end   Date
+		n     int
+	}{
+		{
+			desc:  "zero days noop",
+			start: Date{2014, 5, 9},
+			end:   Date{2014, 5, 9},
+			n:     0,
+		},
+		{
+			desc:  "crossing a year boundary",
+			start: Date{2014, 12, 31},
+			end:   Date{2015, 1, 1},
+			n:     1,
+		},
+		{
+			desc:  "negative number of days",
+			start: Date{2015, 1, 1},
+			end:   Date{2014, 12, 31},
+			n:     -1,
+		},
+		{
+			desc:  "full leap year",
+			start: Date{2004, 1, 1},
+			end:   Date{2005, 1, 1},
+			n:     366,
+		},
+		{
+			desc:  "full non-leap year",
+			start: Date{2001, 1, 1},
+			end:   Date{2002, 1, 1},
+			n:     365,
+		},
+		{
+			desc:  "crossing a leap second",
+			start: Date{1972, 6, 30},
+			end:   Date{1972, 7, 1},
+			n:     1,
+		},
+		{
+			desc:  "dates before the unix epoch",
+			start: Date{101, 1, 1},
+			end:   Date{102, 1, 1},
+			n:     365,
+		},
+	} {
+		if got := test.start.AddDays(test.n); got != test.end {
+			t.Errorf("[%s] %#v.AddDays(%v) = %#v, want %#v", test.desc, test.start, test.n, got, test.end)
+		}
+	}
+}
+
+func TestAddMonths(t *testing.T) {
+	for _, test := range []struct {
+		desc  string
+		start Date
+		end   Date
+		n     int
+	}{
+		{
+			desc:  "zero months noop",
+			start: Date{2014, 5, 9},
+			end:   Date{2014, 5, 9},
+			n:     0,
+		},
+		{
+			desc:  "positive months",
+			start: Date{2014, 1, 1},
+			end:   Date{2014, 2, 1},
+			n:     1,
+		},
+		{
+			desc:  "positive months crossing a year boundary",
+			start: Date{2014, 12, 15},
+			end:   Date{2015, 1, 15},
+			n:     1,
+		},
+		{
+			desc:  "negative months crossing a year boundary",
+			start: Date{2014, 1, 1},
+			end:   Date{2013, 12, 1},
+			n:     -1,
+		},
+		{
+			desc:  "earlier month fewer days",
+			start: Date{2014, 3, 31},
+			end:   Date{2014, 2, 28},
+			n:     -1,
+		},
+		{
+			desc:  "later month fewer days",
+			start: Date{2014, 1, 31},
+			end:   Date{2014, 2, 28},
+			n:     1,
+		},
+	} {
+		if got := test.start.AddMonths(test.n); got != test.end {
+			t.Errorf("[%s] %#v.AddMonths(%v) = %#v, want %#v", test.desc, test.start, test.n, got, test.end)
+		}
+	}
+}
+
 func TestDateBefore(t *testing.T) {
 	for _, test := range []struct {
 		d1, d2 Date

@@ -150,6 +150,10 @@ func (d Date) After(other Date) bool {
 	return other.Before(d)
 }
 
+func (d Date) MonthsUntil(other Date) int {
+	return int(other.Month-d.Month) + (int(other.Year-d.Year) * 12)
+}
+
 func (d Date) MarshalText() ([]byte, error) {
 	return []byte(d.String()), nil
 }

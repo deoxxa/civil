@@ -136,6 +136,10 @@ func (d Date) DaysSince(s Date) (days int) {
 	return int(deltaUnix / 86400)
 }
 
+func (d Date) On(other Date) bool {
+	return d == other
+}
+
 func (d Date) Before(other Date) bool {
 	if d.Year != other.Year {
 		return d.Year < other.Year
@@ -146,8 +150,16 @@ func (d Date) Before(other Date) bool {
 	return d.Day < other.Day
 }
 
+func (d Date) BeforeOrOn(other Date) bool {
+	return d.On(other) || d.Before(other)
+}
+
 func (d Date) After(other Date) bool {
 	return other.Before(d)
+}
+
+func (d Date) AfterOrOn(other Date) bool {
+	return d.On(other) || d.After(other)
 }
 
 func (d Date) MonthsUntil(other Date) int {

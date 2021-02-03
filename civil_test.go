@@ -2,6 +2,7 @@ package civil
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -300,33 +301,76 @@ func TestSetDayClamped(t *testing.T) {
 	}
 }
 
+type comparisonCase struct {
+	d1, d2            Date
+	before, after, on bool
+}
+
+var comparisonCases = []comparisonCase{
+	{Date{2016, 1, 1}, Date{2016, 1, 1}, false, false, true},
+	{Date{2016, 12, 31}, Date{2017, 1, 1}, true, false, false},
+	{Date{2017, 1, 1}, Date{2016, 12, 31}, false, true, false},
+	{Date{2016, 12, 30}, Date{2016, 12, 31}, true, false, false},
+	{Date{2016, 12, 31}, Date{2016, 12, 30}, false, true, false},
+	{Date{2016, 1, 1}, Date{2016, 1, 2}, true, false, false},
+	{Date{2016, 1, 1}, Date{2016, 2, 1}, true, false, false},
+	{Date{2016, 1, 1}, Date{2017, 1, 1}, true, false, false},
+	{Date{2016, 1, 1}, Date{2016, 2, 2}, true, false, false},
+	{Date{2016, 1, 1}, Date{2017, 2, 2}, true, false, false},
+	{Date{2016, 1, 2}, Date{2016, 1, 1}, false, true, false},
+	{Date{2016, 2, 1}, Date{2016, 1, 1}, false, true, false},
+	{Date{2017, 1, 1}, Date{2016, 1, 1}, false, true, false},
+	{Date{2016, 2, 2}, Date{2016, 1, 1}, false, true, false},
+	{Date{2017, 2, 2}, Date{2016, 1, 1}, false, true, false},
+}
+
+func TestDateOn(t *testing.T) {
+	for _, test := range comparisonCases {
+		t.Run(fmt.Sprintf("%v.On(%v)", test.d1, test.d2), func(t *testing.T) {
+			if got := test.d1.On(test.d2); got != test.on {
+				t.Errorf("%v.On(%v): got %t, want %t", test.d1, test.d2, got, test.on)
+			}
+		})
+	}
+}
+
 func TestDateBefore(t *testing.T) {
-	for _, test := range []struct {
-		d1, d2 Date
-		want   bool
-	}{
-		{Date{2016, 12, 31}, Date{2017, 1, 1}, true},
-		{Date{2016, 1, 1}, Date{2016, 1, 1}, false},
-		{Date{2016, 12, 30}, Date{2016, 12, 31}, true},
-	} {
-		if got := test.d1.Before(test.d2); got != test.want {
-			t.Errorf("%v.Before(%v): got %t, want %t", test.d1, test.d2, got, test.want)
-		}
+	for _, test := range comparisonCases {
+		t.Run(fmt.Sprintf("%v.Before(%v)", test.d1, test.d2), func(t *testing.T) {
+			if got := test.d1.Before(test.d2); got != test.before {
+				t.Errorf("%v.Before(%v): got %t, want %t", test.d1, test.d2, got, test.before)
+			}
+		})
+	}
+}
+
+func TestDateBeforeOrOn(t *testing.T) {
+	for _, test := range comparisonCases {
+		t.Run(fmt.Sprintf("%v.BeforeOrOn(%v)", test.d1, test.d2), func(t *testing.T) {
+			if got := test.d1.BeforeOrOn(test.d2); got != (test.before || test.on) {
+				t.Errorf("%v.BeforeOrOn(%v): got %t, want %t", test.d1, test.d2, got, test.before || test.on)
+			}
+		})
 	}
 }
 
 func TestDateAfter(t *testing.T) {
-	for _, test := range []struct {
-		d1, d2 Date
-		want   bool
-	}{
-		{Date{2016, 12, 31}, Date{2017, 1, 1}, false},
-		{Date{2016, 1, 1}, Date{2016, 1, 1}, false},
-		{Date{2016, 12, 30}, Date{2016, 12, 31}, false},
-	} {
-		if got := test.d1.After(test.d2); got != test.want {
-			t.Errorf("%v.After(%v): got %t, want %t", test.d1, test.d2, got, test.want)
-		}
+	for _, test := range comparisonCases {
+		t.Run(fmt.Sprintf("%v.After(%v)", test.d1, test.d2), func(t *testing.T) {
+			if got := test.d1.After(test.d2); got != test.after {
+				t.Errorf("%v.After(%v): got %t, want %t", test.d1, test.d2, got, test.after)
+			}
+		})
+	}
+}
+
+func TestDateAfterOrOn(t *testing.T) {
+	for _, test := range comparisonCases {
+		t.Run(fmt.Sprintf("%v.AfterOrOn(%v)", test.d1, test.d2), func(t *testing.T) {
+			if got := test.d1.AfterOrOn(test.d2); got != (test.after || test.on) {
+				t.Errorf("%v.AfterOrOn(%v): got %t, want %t", test.d1, test.d2, got, test.after || test.on)
+			}
+		})
 	}
 }
 

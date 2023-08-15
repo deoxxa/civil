@@ -166,6 +166,22 @@ func (d Date) MonthsUntil(other Date) int {
 	return int(other.Month-d.Month) + (int(other.Year-d.Year) * 12)
 }
 
+func (d Date) FirstOfMonth() int {
+	return 1
+}
+
+func (d Date) LastOfMonth() int {
+	return maxDay(d.Year, d.Month)
+}
+
+func (d Date) IsFirstOfMonth() bool {
+	return d.Day == d.FirstOfMonth()
+}
+
+func (d Date) IsLastOfMonth() bool {
+	return d.Day == d.LastOfMonth()
+}
+
 func (d Date) MarshalText() ([]byte, error) {
 	return []byte(d.String()), nil
 }

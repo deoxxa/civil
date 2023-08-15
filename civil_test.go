@@ -374,6 +374,65 @@ func TestDateAfterOrOn(t *testing.T) {
 	}
 }
 
+type firstLastCase struct {
+	d               Date
+	first, last     int
+	isFirst, isLast bool
+}
+
+var firstLastCases = []firstLastCase{
+	{Date{2016, 1, 1}, 1, 31, true, false},
+	{Date{2016, 1, 31}, 1, 31, false, true},
+	{Date{2016, 2, 1}, 1, 29, true, false},
+	{Date{2016, 2, 29}, 1, 29, false, true},
+	{Date{2016, 11, 1}, 1, 30, true, false},
+	{Date{2016, 11, 30}, 1, 30, false, true},
+	{Date{2016, 12, 1}, 1, 31, true, false},
+	{Date{2016, 12, 31}, 1, 31, false, true},
+	{Date{2017, 2, 1}, 1, 28, true, false},
+	{Date{2017, 2, 28}, 1, 28, false, true},
+}
+
+func TestFirstOfMonth(t *testing.T) {
+	for _, test := range firstLastCases {
+		t.Run(fmt.Sprintf("%v.FirstOfMonth()", test.d), func(t *testing.T) {
+			if got := test.d.FirstOfMonth(); got != test.first {
+				t.Errorf("%v.FirstOfMonth(): got %d, want %d", test.d, got, test.first)
+			}
+		})
+	}
+}
+
+func TestLastOfMonth(t *testing.T) {
+	for _, test := range firstLastCases {
+		t.Run(fmt.Sprintf("%v.LastOfMonth()", test.d), func(t *testing.T) {
+			if got := test.d.LastOfMonth(); got != test.last {
+				t.Errorf("%v.LastOfMonth(): got %d, want %d", test.d, got, test.last)
+			}
+		})
+	}
+}
+
+func TestIsFirstOfMonth(t *testing.T) {
+	for _, test := range firstLastCases {
+		t.Run(fmt.Sprintf("%v.IsFirstOfMonth()", test.d), func(t *testing.T) {
+			if got := test.d.IsFirstOfMonth(); got != test.isFirst {
+				t.Errorf("%v.IsFirstOfMonth(): got %t, want %t", test.d, got, test.isFirst)
+			}
+		})
+	}
+}
+
+func TestIsLastOfMonth(t *testing.T) {
+	for _, test := range firstLastCases {
+		t.Run(fmt.Sprintf("%v.IsLastOfMonth()", test.d), func(t *testing.T) {
+			if got := test.d.IsLastOfMonth(); got != test.isLast {
+				t.Errorf("%v.IsLastOfMonth(): got %t, want %t", test.d, got, test.isLast)
+			}
+		})
+	}
+}
+
 func TestMarshalJSON(t *testing.T) {
 	for _, test := range []struct {
 		value interface{}
